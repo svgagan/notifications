@@ -1,0 +1,59 @@
+# Server details
+server:
+  port: 8081
+  shutdown: graceful
+
+# Actuator endpoint configurations
+info:
+  app:
+    version: 0.0.1
+    release: '0_20210610'
+    name: ${spring.application.name}
+    servlet:
+      context-path: /NotificationRelayApp
+    java:
+      version: 11
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# Spring configurations
+spring:
+  profiles:
+    active: local
+  application:
+    name: Notifications-application
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      client-id: NotifierClient
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 5
+      batch-size: 16384
+      buffer-memory: 33554432
+      linger-ms: 1
+      enable-Idempotence: true
+      transactionalId: NotificationTransId
+    consumer:
+      bootstrap-servers: localhost:9092
+      client-id: NotifierClient
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer #org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer #org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      auto-offset-reset: earliest
+      isolationLevel: read_committed
+      max-poll-records: 10
+      heartbeat-interval: 6000
+
+kafka:
+  topic:
+    string-demo:
+      name: notification-string-demo
+      groupId: NotificationStringDemoGroup
+    json-demo:
+      name: notification-json-demo
+      groupId: NotificationJsonDemoGroup
